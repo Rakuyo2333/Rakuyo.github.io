@@ -1,4 +1,4 @@
-import { readFile, mkdir, cp, writeFile, rm } from 'node:fs/promises';
+import { readFile, mkdir, cp, writeFile } from 'node:fs/promises';
 import { compileMarkdown } from './markdown.mjs';
 const contents = JSON.parse(await readFile('data/contents.json','utf8'));
 const entities = JSON.parse(await readFile('data/entities.json','utf8'));
@@ -14,6 +14,10 @@ const initial = articles.about.html.replace(/<h1[^>]*>.*?<\/h1>/s,'');
 index = index.replace('__INITIAL_CONTENT__',`<header class="book-opening"><span class="eyebrow">一段乱世 · 五篇札记</span><h1>读南北朝史事札记</h1><span class="opening-caption">读史有感，落笔成札。</span></header><div class="article-body">${initial}</div><noscript><p>开启 JavaScript 可使用章节目录、注释与历史地图。</p></noscript>`);
 await writeFile('dist/index.html',index);
 await writeFile('dist/.nojekyll','');
-// A 404 page has relative assets corrected for the known GitHub Pages project path.
-await writeFile('dist/404.html',index.replace('<head>','<head><base href="/Rakuyo.github.io/">'));
+// GitHub sets GITHUB_REPOSITORY automatically. User sites are served at /;
+// project sites keep their repository prefix until a rename is completed.
+const [owner, repository] = (process.env.GITHUB_REPOSITORY || 'Rakuyo2333/rakuyo2333.github.io').split('/');
+if (!owner || !repository || /[^A-Za-z0-9_.-]/.test(owner + repository)) throw new Error('Invalid GitHub repository name');
+const basePath = repository.toLowerCase() === `${owner.toLowerCase()}.github.io` ? '/' : `/${repository}/`;
+await writeFile('dist/404.html',index.replace('<head>',`<head><base href="${basePath}">`));
 console.log('Built original articles, annotations and offline map to dist/');

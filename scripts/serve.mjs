@@ -6,7 +6,7 @@ const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charse
 const server = http.createServer(async (req,res) => {
   try {
     const url = new URL(req.url,'http://localhost');
-    let name = decodeURIComponent(url.pathname).replace(/^\/Rakuyo.github\.io(?=\/|$)/,'');
+    const name = decodeURIComponent(url.pathname);
     const file = path.resolve(root,'.'+name+(name.endsWith('/')?'index.html':''));
     if(!file.startsWith(root+path.sep)) {res.writeHead(403).end();return;}
     const content = await readFile(file); res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-cache'}).end(content);

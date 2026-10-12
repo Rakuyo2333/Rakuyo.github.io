@@ -1,0 +1,14 @@
+[
+ {"id":"about","title":"关于","label":"卷首","file":"content/about.md"},
+ {"id":"hanhua","title":"汉化之殇","label":"壹","children":[
+  {"id":"hanhua/ambition","title":"孝文帝的雄心","label":"第一部分","children":[{"id":"hanhua/ambition/feng","title":"冯太后","file":"content/hanhua/ambition/feng.md"}]},
+  {"id":"hanhua/why","title":"为什么必须汉化？","label":"第二部分"},
+  {"id":"hanhua/opposition","title":"那些反对的声音","label":"第三部分"},
+  {"id":"hanhua/luoyang","title":"迁都洛阳之后","label":"第四部分"},
+  {"id":"hanhua/undercurrent","title":"暗流涌动","label":"第五部分"}
+ ]},
+ {"id":"liuzhen","title":"烽火六镇","label":"贰"},
+ {"id":"hebei","title":"河北风云","label":"叁"},
+ {"id":"yubi","title":"玉璧之战","label":"肆"},
+ {"id":"zhouqi","title":"周武灭齐","label":"伍"}
+]

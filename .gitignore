@@ -1,0 +1,8 @@
+dist/
+node_modules/
+previous-site/
+previous-source.tar
+recover-source.mjs
+*.log
+previews/
+upload-files.json

@@ -6,3 +6,8 @@ recover-source.mjs
 *.log
 previews/
 upload-files.json
+.editor-state/
+editor/runtime/
+editor/test-output/
+史札编辑器.exe
+史札本地编辑器.zip

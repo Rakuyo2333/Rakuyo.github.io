@@ -6,13 +6,13 @@ function indexNodes(items, parents=[]) { items.forEach(item=>{nodes.set(item.id,
 indexNodes(data.contents);
 let current = 'about';
 function renderToc(items, level=0) {
- return items.map(item=>item.children ? `<details class="toc-group" ${item.id==='hanhua'||item.id==='hanhua/ambition'?'open':''} data-group="${item.id}"><summary>${level===0?`<span class="chapter-number">${item.label}</span>`:''}<span>${level>0?`<small class="part-label">${item.label}</small>`:''}${escape(item.title)}</span></summary>${level===0?`<a class="toc-link" href="#/${item.id}">篇目总览</a>`:''}${renderToc(item.children,level+1)}</details>` : `<a class="toc-link" href="#/${item.id}" data-route="${item.id}">${level===0?`<span class="chapter-number">${item.label}</span>`:''}<span>${level===1?`<small class="part-label">${item.label}</small>`:''}${escape(item.title)}</span>${!item.file?'<small class="unpublished">待续</small>':''}</a>`).join('');
+ return items.map(item=>item.children ? `<details class="toc-group" ${item.id==='hanhua'||item.id==='hanhua/ambition'?'open':''} data-group="${item.id}"><summary>${level===0?`<span class="chapter-number">${item.label}</span>`:''}<span>${level>0?`<small class="part-label">${item.label}</small>`:''}${escape(item.title)}</span></summary>${level===0?`<a class="toc-link" href="#/${item.id}">篇目总览</a>`:''}${renderToc(item.children,level+1)}</details>` : `<a class="toc-link" href="#/${item.id}" data-route="${item.id}">${level===0?`<span class="chapter-number">${item.label}</span>`:''}<span>${level===1?`<small class="part-label">${item.label}</small>`:''}${escape(item.title)}</span></a>`).join('');
 }
 $('#toc').innerHTML = renderToc(data.contents);
 function setMenu(open) {$('#sidebar').classList.toggle('visible',open);$('#sidebar').inert=innerWidth<=760&&!open;$('#scrim').hidden=!open;$('#menu-toggle').setAttribute('aria-expanded',String(open));$('#menu-toggle').setAttribute('aria-label',open?'关闭目录':'打开目录');}
 $('#menu-toggle').onclick=()=>setMenu(!$('#sidebar').classList.contains('visible'));
 $('#scrim').onclick=()=>setMenu(false);
-function chapterList(items) {return `<div class="chapter-index">${items.map((item,i)=>`<a href="#/${item.id}"><span class="number">${item.label&&item.label.length<3?item.label:String(i+1).padStart(2,'0')}</span><span class="name">${item.label&&item.label.length>=3?`<small class="part-label">${item.label}</small>`:''}${escape(item.title)}</span><small>${item.file?'阅读正文':item.children?'展开篇目':'待续'} ↗</small></a>`).join('')}</div>`;}
+function chapterList(items) {return `<div class="chapter-index">${items.map((item,i)=>`<a href="#/${item.id}"><span class="number">${item.label&&item.label.length<3?item.label:String(i+1).padStart(2,'0')}</span><span class="name">${item.label&&item.label.length>=3?`<small class="part-label">${item.label}</small>`:''}${escape(item.title)}</span><small>${item.file?'阅读正文':item.children?'展开篇目':''} ↗</small></a>`).join('')}</div>`;}
 function renderRoute() {
   const raw = location.hash.replace(/^#\/?/,'');
   let id; try {id=decodeURIComponent(raw)||'about';}catch{id='about';}
@@ -28,12 +28,13 @@ function renderRoute() {
       const body=article.html.replace(/<h1[^>]*>.*?<\/h1>/s,'');
       const count=article.text.replace(/\s/g,'').length;
       $('#reading-length').textContent=`${count.toLocaleString('zh-CN')} 字 · 约 ${Math.ceil(count/300)} 分钟`;
-      const title=id==='about'?`<header class="book-opening"><span class="eyebrow">一段乱世 · 五篇札记</span><h1>读南北朝史事札记</h1><span class="opening-caption">读史有感，落笔成札。</span></header>`:`<header><p class="book-kicker">汉化之殇 / 第一部分 · 孝文帝的雄心</p><h1>${escape(node.title)}</h1><span class="opening-caption">原创札记 · 正文第一篇</span></header>`;
+      const articleContext=node.parents.map(parent=>parent.label?.length>2?`${parent.label} · ${parent.title}`:parent.title).join(' / ') || '原创文章';
+      const title=id==='about'?`<header class="book-opening"><span class="eyebrow">一段乱世 · 五篇札记</span><h1>读南北朝史事札记</h1><span class="opening-caption">读史有感，落笔成札。</span></header>`:`<header><p class="book-kicker">${escape(articleContext)}</p><h1>${escape(node.title)}</h1><span class="opening-caption">原创札记</span></header>`;
       const notes=article.entities.length?`<details class="endnotes"><summary>随文注释 · ${article.entities.length} 个词条</summary><ul>${article.entities.map(key=>`<li><button class="entry" data-entity="${key}" aria-haspopup="dialog">${escape(data.entities[key].name)}</button>${escape(data.entities[key].summary)}</li>`).join('')}</ul></details>`:'';
       html=title+`<div class="article-body">${body}</div>`+notes;
       html+=id==='about'?`<div class="article-navigation"><span>由此开篇</span><a href="#/hanhua/ambition/feng">汉化之殇 · 冯太后 →</a></div>`:`<div class="article-navigation"><a href="#/about">← 卷首与时代背景</a><a href="#/hanhua">汉化之殇 · 篇目 →</a></div>`;
     }else if(node.children){$('#reading-length').textContent='篇目';html=`<header class="book-opening"><span class="eyebrow">${escape(node.label||'汉化之殇')}</span><h1>${escape(node.title)}</h1></header>${chapterList(node.children)}`;}
-    else{$('#reading-length').textContent='尚未刊出';html=`<header class="book-opening"><span class="eyebrow">${escape(node.label||'札记')}</span><h1>${escape(node.title)}</h1></header><div class="empty-note"><div class="empty-symbol">待续</div><p>此篇札记尚未刊出。<br>待作者落笔，再与诸君共读。</p><a class="text-button" href="#/hanhua/ambition/feng">阅读已刊文章：冯太后 →</a></div>`;}
+    else{$('#reading-length').textContent='尚未刊出';html=`<header class="book-opening"><span class="eyebrow">${escape(node.label||'札记')}</span><h1>${escape(node.title)}</h1></header><div class="empty-note"><p>此篇札记尚未刊出。<br>待作者落笔，再与诸君共读。</p><a class="text-button" href="#/hanhua/ambition/feng">阅读已刊文章：冯太后 →</a></div>`;}
     $('#article').innerHTML=html;
     $('#page-outline').innerHTML=[...$('#article').querySelectorAll('.article-body h2,.article-body h3')].map(h=>`<a href="#${h.id}" data-section="${h.id}">${h.textContent}</a>`).join('');
   }
@@ -109,7 +110,7 @@ function renderMap(){
  mapTransform();showMapInfo(null);
 }
 function openMap(key){hideAnnotation();mapDialog.showModal();document.body.classList.add('modal-open');zoom=1;pan={x:0,y:0};renderMap();if(key){if(!eras[$('#map-era').value].keys.includes(key)){$('#map-era').value=key==='feishui'?'383':'493';renderMap();}showMapInfo(key);}}
-$('#map-open').onclick=()=>openMap();$('#aside-map-open').onclick=()=>openMap();$('#map-close').onclick=()=>mapDialog.close();mapDialog.addEventListener('close',()=>document.body.classList.remove('modal-open'));
+$('#map-open').onclick=()=>openMap();$('#map-close').onclick=()=>mapDialog.close();mapDialog.addEventListener('close',()=>document.body.classList.remove('modal-open'));
 $('#map-era').onchange=()=>{zoom=1;pan={x:0,y:0};renderMap();};
 world.addEventListener('click',event=>{const city=event.target.closest('[data-city]');if(city)showMapInfo(city.dataset.city);});
 world.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){const city=event.target.closest('[data-city]');if(city){event.preventDefault();showMapInfo(city.dataset.city);}}});

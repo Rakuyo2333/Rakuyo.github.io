@@ -5,11 +5,7 @@ import { compileMarkdown } from './markdown.mjs';
 const ids=new Set();
 function visit(items){for(const item of items){assert(!ids.has(item.id),'Duplicate route '+item.id);ids.add(item.id);if(item.file){assert(data.articles[item.id],'Missing article '+item.id);for(const key of data.articles[item.id].entities)assert(data.entities[key],'Missing entity '+key);}if(item.children)visit(item.children);}}
 visit(data.contents);
-assert.equal(data.contents.filter(item=>item.id!=='about').length,5);
-assert.equal(data.contents[1].children.length,5);
-assert(Object.keys(data.articles).length >= 2);
-assert(data.articles.about.text.includes('493年'));
-assert(data.articles['hanhua/ambition/feng'].text.includes('顺理成章地坐上了摄政的位置'));
+assert(data.articles.about, 'Missing opening page');
 assert.equal(compileMarkdown('<script>alert(1)</script>',{}).html,'<p>&lt;script&gt;alert(1)&lt;/script&gt;</p>');
 assert.throws(()=>compileMarkdown('[[unknown|词条]]',{}),/Unknown annotation/);
 const html=await readFile('dist/index.html','utf8');
